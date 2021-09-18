@@ -1,8 +1,19 @@
 # youtube
-YouTube-Related Scripts And Whatnot.
+YouTube-related scripts and whatnot.
 
+# List of Tools
+[OBS](https://obsproject.com/) for recording capture.  
+[Davinci Resolve](https://www.blackmagicdesign.com/products/davinciresolve/). Used in the dad tries to automate channel tasks video.  
+[Paint.net](https://www.getpaint.net/) for general image manipulation.  
+[Image Magick](https://imagemagick.org/) for thumbnail generation.  
+Music from [Incompetech](https://incompetech.filmmusic.io).  
+Orange grate image from [Pixabay]( https://pixabay.com/users/brett_hondow-49958/).  
+Bebas Neue font from [google fonts](https://fonts.google.com/specimen/Bebas+Neue).  
+Nunito Sans font from [google fonts](https://fonts.google.com/specimen/Nunito+Sans).  
+Screen grabs courtesy of `Win+Shift+S`
+  
 # makeThumbnail.ps1
-Using ImageMagick, this script will generate an image that can be used as a youtube thumbnail.
+This powershell script will generate an image that can be used as a youtube thumbnail. Requires [Image Magick](https://imagemagick.org/).
 
 ## Simple Usage
 At its simplest, you're required to provide 2 things: an episode # and a background image.  
