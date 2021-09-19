@@ -23,3 +23,6 @@ At its simplest, you're required to provide 2 things: an episode # and a backgro
 If you do not provide either, you'll be prompted for them. Note: YouTube recommends 1280x720 for a thumbnail size. The generated image will be titled 'thumbnail.png'  
   
 Use `get-help .\makeThumbnail.ps1 -detailed` for more information
+
+# Command Line Stuff
+Use ffmpeg to extract audio from an mp4 (use OBS for audio-only capture) `ffmpeg -i source.mp4 -vn -c:a copy audio-only.m4a`
