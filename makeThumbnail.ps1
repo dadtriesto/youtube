@@ -67,7 +67,7 @@ Param(
     [string]$titleGravity = "NorthWest",
     [string]$titleBackgound = "none",
     [string]$subTitleAction = "Play",
-    [string]$subTitle = "${subTitleAction}: $seriesName",
+    [string]$subTitle = "${subTitleAction} $seriesName",
     [string]$fontName = "Bebas-Neue-Regular",
     [Int]$fontSize = 108,
     [string]$fontColor = "white",
