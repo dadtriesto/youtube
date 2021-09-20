@@ -56,6 +56,8 @@
 Param(
     [string]$thumbnail = "final.png",
     [Parameter(Mandatory=$true)]
+    [string]$seriesName,
+    [Parameter(Mandatory=$true)]
     [string]$episodeNumber,
     [string]$episodeNumberGravity = "SouthEast",
     [string]$episodeBackground = "none",
@@ -64,7 +66,8 @@ Param(
     [string]$title = "DAD TRIES TO",
     [string]$titleGravity = "NorthWest",
     [string]$titleBackgound = "none",
-    [string]$subTitle = "<Verb> <Task>",
+    [string]$subTitleAction = "Play",
+    [string]$subTitle = "${subTitleAction}: $seriesName",
     [string]$fontName = "Bebas-Neue-Regular",
     [Int]$fontSize = 108,
     [string]$fontColor = "white",
@@ -105,7 +108,8 @@ write-output "Compositing episode.png and $background to intermediary.png"
 magick composite -resize '1x1<' -gravity $episodeNumberGravity -geometry +25+10 episode.png $background intermediary.png
 # composite episode onto intermediary -> $thumbnail
 write-output "Compositing title.png and intermediary.png to $thumbnail"
-magick composite -resize '1x1<' -gravity $titleGravity -geometry +25+10 title.png .\intermediary.png $thumbnail
+$outFileName = "${seriesName}_thumbnail_${episodeNumber}.png"
+magick composite -resize '1x1<' -gravity $titleGravity -geometry +25+10 title.png .\intermediary.png $outFileName.Replace(' ','_')
 
 write-output "removing title.png"
 Remove-Item title.png

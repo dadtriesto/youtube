@@ -3,6 +3,7 @@
 ## Misc
 - Script playlist additions to keep uploaded but unreleased vids out of the playlist
 - 2nd channel to try out things like API access?
+- Better mic (pop filter?)
 
 ## makeThumbnail.ps1
 - Description created from standard bits and pieces (sorta like mail merge for video descriptions)
