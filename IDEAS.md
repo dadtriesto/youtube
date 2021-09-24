@@ -10,7 +10,8 @@
 - store api keys / env vars (Azure Key Vault? Session vars?) and use the YouTube API to automate uploads, set scheduling
 
 ## OBS
-- Get a better handle on scenes, ex. fade to 10-20s of outro for YT end screen. Should be short. Enough time to say thanks for watching. Hate lengthy outros.
+- ~~Get a better handle on scenes, ex. fade to 10-20s of outro for YT end screen. Should be short. Enough time to say thanks for watching. Hate lengthy outros.
+- - Added end screen in OBS w/ hotkey to transition. YT limits end screen to 20s (good).
 
 ## Resolve
 - Backup strategies? Probably not going to use this tool much, but a cursory glance at options is probably a good idea.
