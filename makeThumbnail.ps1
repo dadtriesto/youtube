@@ -48,7 +48,7 @@
     Default: black. The font color ImageMagick will use to outline title and episode text.
 .PARAMETER fontStrokeWidth
     Default: 1. The width of the outline ImageMagick will apply to title and episode.
-.PARAMETER dooblyDo
+.PARAMETER description
     Default: none. If provided, will echo contents of text file passed to it to make editing uploads a little faster. Future update: generate from input schema file.
 #> 
 
@@ -73,7 +73,7 @@ Param(
     [string]$fontColor = "white",
     [string]$fontStrokeColor = "black",
     [Int]$fontStrokeWidth = 1,
-    [string]$dooblyDo
+    [string]$description
 );
 
 write-output "Making thumbnail"
@@ -118,9 +118,10 @@ Remove-Item episode.png
 write-output "removing intermediary.png"
 Remove-Item intermediary.png
 write-output "Thumbnail [$thumbnail] created"
-write-output "Suggested YouTube Title: ${title}: $subTitle, $paddedEpisode"
+$titleCasedTitle = (Get-Culture).TextInfo.ToTitleCase($title.ToLower())
+write-output "Suggested YouTube Title: ${titleCasedTitle}: $subTitle, $paddedEpisode"
 
-if($dooblyDo){
-    write-output "Doobly Do"
-    Get-Content $dooblyDo | write-output 
+if($description){
+    write-output "Descrption"
+    Get-Content $description | write-output 
 }

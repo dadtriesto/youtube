@@ -1,3 +1,10 @@
+# Recording Checklist
+- [ ] OBS shows window to be recorded
+- [ ] Game audio OK
+- [ ] Mic audio ok
+- [ ] Mic is hot (-not- muted)
+- [ ] OBS is recording
+
 # Upload Checklist
 - [ ] Remux recording
 - [ ] Capture thumbnail background
