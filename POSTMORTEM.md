@@ -29,3 +29,7 @@ Quick review of each episode to identify improvements, things to repeat, etc. It
 
 ## DTT Play Project Zomboid 03/04
 - Need to balance telling a story w/ paying attention to the game. Ended a run while talking. Still, made for a nice jump scare.
+
+## DTT Play Project Zomboid 05
+- Press "Play" not "random" when creating a character, lol
+- Double-back for items at your peril
