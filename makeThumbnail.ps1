@@ -54,7 +54,7 @@
 
 [CmdletBinding(DefaultParametersetName = "setDefault")]
 Param(
-    [string]$thumbnail = "final.png",
+    [string]$outPath,
     [Parameter(Mandatory=$true)]
     [string]$seriesName,
     [Parameter(Mandatory=$true)]
@@ -69,17 +69,13 @@ Param(
     [string]$subTitleAction = "Play",
     [string]$subTitle = "${subTitleAction} $seriesName",
     [string]$fontName = "Bebas-Neue-Regular",
-    [Int]$fontSize = 108,
+    [Int]$fontSize = 128,
     [string]$fontColor = "white",
     [string]$fontStrokeColor = "black",
     [Int]$fontStrokeWidth = 1,
     [string]$description
 );
 
-write-output "Making thumbnail"
-write-output "Thumbnail: [$thumbnail]"
-write-output "Background: [$background]"
-write-output "Episode: [$episode]"
 if(!$background){
     write-output "No background provided. Please select a background"
 }
@@ -97,31 +93,34 @@ if(!$background){
 
 
 # make the DTT label
-write-output "Making title image title.png"
-magick convert -background $titleBackgound -fill $fontColor -font $fontName -pointsize $fontSize -stroke $fontStrokeColor -strokewidth $fontStrokeWidth label:$title title.png
+#write-output "Making title image title.png"
+#magick convert -background $titleBackgound -fill $fontColor -font $fontName -pointsize $fontSize -stroke $fontStrokeColor -strokewidth $fontStrokeWidth label:$title title.png
 # make the episode label
 $paddedEpisode = ($episodeNumber).PadLeft($episodeZeroPad,'0')
-write-output "Making episode $paddedEpisode image episode.png"
-magick convert -background $episodeBackground -fill $fontColor -font $fontName -pointsize $fontSize -stroke $fontStrokeColor -strokewidth $fontStrokeWidth label:$paddedEpisode episode.png
+#write-output "Making episode $paddedEpisode image episode.png"
+#magick convert -background $episodeBackground -fill $fontColor -font $fontName -pointsize $fontSize -stroke $fontStrokeColor -strokewidth $fontStrokeWidth label:$paddedEpisode episode.png
 # composite label onto background -> intermediary
-write-output "Compositing episode.png and $background to intermediary.png"
-magick composite -resize '1x1<' -gravity $episodeNumberGravity -geometry +25+10 episode.png $background intermediary.png
+#write-output "Compositing episode.png and $background to intermediary.png"
+#magick composite -resize '1x1<' -gravity $episodeNumberGravity -geometry +25+10 episode.png $background intermediary.png
 # composite episode onto intermediary -> $thumbnail
-write-output "Compositing title.png and intermediary.png to $thumbnail"
 $outFileName = "${seriesName}_thumbnail_${episodeNumber}.png"
-magick composite -resize '1x1<' -gravity $titleGravity -geometry +25+10 title.png .\intermediary.png $outFileName.Replace(' ','_')
+write-output "Compositing title.png and intermediary.png to $outFileName"
+$output = join-path $outPath $outFileName.Replace(' ','_')
+#magick composite -resize '1x1<' -gravity $titleGravity -geometry +25+10 title.png .\intermediary.png $output
+magick convert $background -font $fontName -fill $fontColor -pointsize $fontSize -stroke $fontStrokeColor -strokewidth $fontStrokeWidth -gravity $episodeNumberGravity -annotate +25+10 $paddedEpisode -gravity $titleGravity -annotate +25+10 $title $output
 
-write-output "removing title.png"
-Remove-Item title.png
-write-output "removing episode.png"
-Remove-Item episode.png
-write-output "removing intermediary.png"
-Remove-Item intermediary.png
-write-output "Thumbnail [$thumbnail] created"
+#write-output "removing title.png"
+#Remove-Item title.png
+#write-output "removing episode.png"
+#Remove-Item episode.png
+#write-output "removing intermediary.png"
+#Remove-Item intermediary.png
+write-output "Thumbnail [$outFileName] created"
 $titleCasedTitle = (Get-Culture).TextInfo.ToTitleCase($title.ToLower())
-write-output "Suggested YouTube Title: ${titleCasedTitle}: $subTitle, $paddedEpisode"
-
+Write-Output `n
+write-output "${titleCasedTitle}: $subTitle, $paddedEpisode"
+Write-Output `n`n
 if($description){
-    write-output "Descrption"
     Get-Content $description | write-output 
 }
+Write-Output `n`n
