@@ -73,17 +73,19 @@ Param(
     [string]$fontColor = "white",
     [string]$fontStrokeColor = "black",
     [Int]$fontStrokeWidth = 1,
-    [string]$description
+    [string]$description,
+    [Parameter(Mandatory=$true)]
+    [string]$contactBlock
 );
 
 if(!$background){
-    write-output "No background provided. Please select a background"
+    write-output "Please select a background"
 }
 
 if(!$background){
     Add-Type -AssemblyName System.Windows.Forms
     $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog
-    $null = $FileBrowser.ShowDialog()
+    $null = $FileBrowser.ShowDialog() # -still- not topmost from vs code terminal...
     if(!$FileBrowser.FileName){
         exit 0
     }
@@ -92,35 +94,21 @@ if(!$background){
 }
 
 
-# make the DTT label
-#write-output "Making title image title.png"
-#magick convert -background $titleBackgound -fill $fontColor -font $fontName -pointsize $fontSize -stroke $fontStrokeColor -strokewidth $fontStrokeWidth label:$title title.png
 # make the episode label
 $paddedEpisode = ($episodeNumber).PadLeft($episodeZeroPad,'0')
-#write-output "Making episode $paddedEpisode image episode.png"
-#magick convert -background $episodeBackground -fill $fontColor -font $fontName -pointsize $fontSize -stroke $fontStrokeColor -strokewidth $fontStrokeWidth label:$paddedEpisode episode.png
-# composite label onto background -> intermediary
-#write-output "Compositing episode.png and $background to intermediary.png"
-#magick composite -resize '1x1<' -gravity $episodeNumberGravity -geometry +25+10 episode.png $background intermediary.png
-# composite episode onto intermediary -> $thumbnail
 $outFileName = "${seriesName}_thumbnail_${episodeNumber}.png"
-write-output "Compositing title.png and intermediary.png to $outFileName"
 $output = join-path $outPath $outFileName.Replace(' ','_')
-#magick composite -resize '1x1<' -gravity $titleGravity -geometry +25+10 title.png .\intermediary.png $output
 magick convert $background -font $fontName -fill $fontColor -pointsize $fontSize -stroke $fontStrokeColor -strokewidth $fontStrokeWidth -gravity $episodeNumberGravity -annotate +25+10 $paddedEpisode -gravity $titleGravity -annotate +25+10 $title $output
 
-#write-output "removing title.png"
-#Remove-Item title.png
-#write-output "removing episode.png"
-#Remove-Item episode.png
-#write-output "removing intermediary.png"
-#Remove-Item intermediary.png
-write-output "Thumbnail [$outFileName] created"
+write-output "Thumbnail [$output] created"
 $titleCasedTitle = (Get-Culture).TextInfo.ToTitleCase($title.ToLower())
-Write-Output `n
+Write-Output `n"--"
 write-output "${titleCasedTitle}: $subTitle, $paddedEpisode"
-Write-Output `n`n
+Write-Output "--"`n
 if($description){
     Get-Content $description | write-output 
+}
+if($contactBlock){
+    Get-Content $contactBlock | write-output 
 }
 Write-Output `n`n
