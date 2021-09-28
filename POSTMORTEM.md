@@ -1,5 +1,5 @@
 # Episode Post Mortems
-Quick review of each episode to identify improvements, things to repeat, etc. Items to work on will promote to IDEAS.md.
+Quick review of episodes to identify improvements, things to repeat, etc. Items to work on will promote to IDEAS.md.
 
 ## DTT Automate Channel Tasks
 
