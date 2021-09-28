@@ -1,4 +1,4 @@
-# youtube
+# YouTube
 Files, scripts and releated ephemera from learning to YouTube.
 
 # List of Tools
