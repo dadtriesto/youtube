@@ -3,7 +3,7 @@ Files, scripts and releated ephemera from learning to YouTube.
 
 # List of Tools
 [OBS](https://obsproject.com/) for recording capture.  
-[Davinci Resolve](https://www.blackmagicdesign.com/products/davinciresolve/). Used in the dad tries to automate channel tasks video.  
+[Davinci Resolve](https://www.blackmagicdesign.com/products/davinciresolve/). Used in the dad tries to automate channel tasks video and for other various overlays/edits.  
 [Paint.net](https://www.getpaint.net/) for general image manipulation.  
 [Image Magick](https://imagemagick.org/) for thumbnail generation.  
 Music from [Incompetech](https://incompetech.filmmusic.io).  
