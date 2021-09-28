@@ -26,3 +26,6 @@ Use `get-help .\makeThumbnail.ps1 -detailed` for more information
 
 # Command Line Stuff
 Use ffmpeg to extract audio from an mp4 (use OBS for audio-only capture) `ffmpeg -i source.mp4 -vn -c:a copy audio-only.m4a`  
+Use ffmpeg to concatenate videos where filenames are contained in a file called 'concatList.txt' with lines like `file 'path/to/file.ext'`
+  
+`ffmpeg -safe 0 -f concat -i concatList.txt -c copy "concatenatedFile.mp4"`
