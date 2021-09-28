@@ -1,5 +1,5 @@
 # youtube
-YouTube-related scripts and whatnot.
+Files, scripts and releated ephemera from learning to YouTube.
 
 # List of Tools
 [OBS](https://obsproject.com/) for recording capture.  
