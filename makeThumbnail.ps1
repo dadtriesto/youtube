@@ -18,10 +18,12 @@
     Requires    : ImageMagick
     License     : MPL 2.0 (See Repo)
 
-.PARAMETER thumbnail
-    The filename of your finalized thumbnail. Can include path
+.PARAMETER outPath
+    The location to save your finalized thumbnail.
+.PARAMETER seriesName
+    Required. The name of your series. Used in thumbail file name and suggested upload title.
 .PARAMETER episodeNumber
-    The number of the episode to display on the thumbnail
+    Required. The number of the episode to display on the thumbnail
 .PARAMETER episodeNumberGravity
     Default: SouthEast. Tells ImageMagick where to place the episode number. Uses no-space compass bearings (NorthEast, SouthWest, etc).
 .PARAMETER episodeBackground
@@ -50,14 +52,15 @@
     Default: 1. The width of the outline ImageMagick will apply to title and episode.
 .PARAMETER description
     Default: none. If provided, will echo contents of text file passed to it to make editing uploads a little faster. Future update: generate from input schema file.
+.PARAMETER contactBlock
+    Required. Default: none. If provided, will echo contents of text file passed to it to make editing uploads a little faster. Future update: generate from input schema file.
 #> 
 
 [CmdletBinding(DefaultParametersetName = "setDefault")]
 Param(
     [string]$outPath,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$seriesName,
-    [Parameter(Mandatory=$true)]
     [string]$episodeNumber,
     [string]$episodeNumberGravity = "SouthEast",
     [string]$episodeBackground = "none",
@@ -74,41 +77,44 @@ Param(
     [string]$fontStrokeColor = "black",
     [Int]$fontStrokeWidth = 1,
     [string]$description,
-    [Parameter(Mandatory=$true)]
-    [string]$contactBlock
+    [string]$contactBlock,
+    [string]$configFile = '.\makeThumbnail.json',
+    [Boolean]$skipWrite = $false
 );
+$global:needsUpdate = $false
 
+Import-Module (Resolve-Path('makeThumbnailFunctions.psm1')) -Force
+# Get-Module
+#read config
+$config = Read-ConfigFile -configFile $configFile
+$seriesPath = $seriesName.toLower()
+Get-ConfigValue -config $config -series $seriesName -key "Description"
+if(!$description){
+    $description = '..\..\..\'+$seriesPath+'\Description.txt'
+}
 if(!$background){
-    write-output "Please select a background"
+    $background = '..\..\..\'+$seriesPath+'\'+$seriesPath.replace(' ', '_')+'_bg.png'
+}
+if(!$contactBlock){
+    $contactBlock = '..\..\..\dad tries to\social media\contact.txt'
+}
+if(!$episodeNumber){
+    $episodeNumber = [Int]($config.$seriesName.episodeNumber) + 1
 }
 
-if(!$background){
-    Add-Type -AssemblyName System.Windows.Forms
-    $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog
-    $null = $FileBrowser.ShowDialog() # -still- not topmost from vs code terminal...
-    if(!$FileBrowser.FileName){
-        exit 0
+# if seriesName isn't in config, create an entry?
+# if seriesName is in config, check for cli overrides, then set desc/ep/bkg to config file contents
+
+#create new stuff
+Get-Background -background $background
+New-Thumbnail -number $episodeNumber -zeroPad $episodeZeroPad -font $fontName -point $fontSize -color $fontColor -strokeColor $fontStrokeColor -strokeWidth $fontStrokeWidth -episodeGravity $episodeNumberGravity -titleGravity $titleGravity -title $title -outPath $outPath -seriesName $seriesName -background $background
+Write-TitleAndDescription -number $episodeNumber -zeroPad $episodeZeroPad -title $title -subTitle $subTitle -description $description -contactBlock $contactBlock
+
+#update configs
+Update-GlobalConfig -config $config -outPath $outPath -contactBlock $contactBlock
+Update-SeriesConfig -config $config -series $seriesName -episodeNumber $episodeNumber -description $description -background $background
+if($global:needsUpdate){
+    if(!$skipWrite){
+        Save-ConfigFile -config $config -configFile $configFile
     }
-    
-    $background = $FileBrowser.FileName
 }
-
-
-# make the episode label
-$paddedEpisode = ($episodeNumber).PadLeft($episodeZeroPad,'0')
-$outFileName = "${seriesName}_thumbnail_${episodeNumber}.png"
-$output = join-path $outPath $outFileName.Replace(' ','_')
-magick convert $background -font $fontName -fill $fontColor -pointsize $fontSize -stroke $fontStrokeColor -strokewidth $fontStrokeWidth -gravity $episodeNumberGravity -annotate +25+10 $paddedEpisode -gravity $titleGravity -annotate +25+10 $title $output
-
-write-output "Thumbnail [$output] created"
-$titleCasedTitle = (Get-Culture).TextInfo.ToTitleCase($title.ToLower())
-Write-Output `n"--"
-write-output "${titleCasedTitle}: $subTitle, $paddedEpisode"
-Write-Output "--"`n
-if($description){
-    Get-Content $description | write-output 
-}
-if($contactBlock){
-    Get-Content $contactBlock | write-output 
-}
-Write-Output `n`n
