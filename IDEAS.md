@@ -12,6 +12,7 @@
 - Keep track of the last episode number (per seriesName)
 - - Simple text file w/ key/value pairs would probably do this. Maybe JSON (see next bullet. convertto/from-json)?
 - - Extend this to other things like description, thumbnail background, contact block, etc? Yes. Allow for cli overrides.
+- Could use parameter sets for mutually exclusive things (like an episode override param)
 
 ## OBS
 
