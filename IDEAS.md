@@ -7,6 +7,7 @@
 - Cleanup OBS files about once a week? Once a month?
 
 ## makeThumbnail.ps1
+- Need a way to create a thumbnail w/out episode (one-offs, interruptions, etc)
 - store api keys / env vars (Azure Key Vault? Session vars?) and use the YouTube API to automate uploads, set scheduling
 - Keep track of the last episode number (per seriesName)
 - - Simple text file w/ key/value pairs would probably do this. Maybe JSON (see next bullet. convertto/from-json)?
