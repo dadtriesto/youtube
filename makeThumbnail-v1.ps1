@@ -1,0 +1,2 @@
+# 137 | %{magick convert .\crusader1280x720.jpg -fill "rgba(0,0,0,0.5)" -draw "rectangle 100,0 500,720" -font "..\\fonts\\PS_Steiner\\Steiner.otf" -pointsize 70 -interword-spacing 10 -interline-spacing -10 -kerning 0 -strokewidth 2 -stroke black -fill "rgba(255,255,255,1)" -gravity north -annotate -340+475 "Dad\nTries\nTo" -pointsize 80 -annotate -340+10 "#$_" .\MW5-alt-logo-red.png -gravity center -geometry 363x125-340-35 -composite output.jpg}
+
