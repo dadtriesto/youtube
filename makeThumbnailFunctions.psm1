@@ -3,29 +3,10 @@ Function Set-NeedsUpdate() {
     $global:needsUpdate = $update
 }
 
-Function Update-GlobalConfig() {
-    Param($config, $outPath, $contactBlock)
-
-    # update contact block if different
-    if ($config.makeThumbnail.contactBlock -ne $contactBlock) {
-        Write-Output "Updating contactBlock config"
-        $config.makeThumbnail.contactBlock = $contactBlock
-        Set-NeedsUpdate -update $true
-    }
-
-    # update outpath if different
-    if ($config.makeThumbnail.outPath -ne $outPath -and ("" -ne $outPath)) {
-        Write-Output "Updating outPath config"
-        $config.makeThumbnail.outPath = $outPath
-        Set-NeedsUpdate -update $true
-    }
-}
-
 Function Add-Series() {
     Param($config, $seriesName)
 
     $newSeriesConfig = [pscustomobject]@{
-        "description"   = $description
         "episodeNumber" = $episodeNumber
         "background"    = $background
         "fontName"      = $fontName
@@ -40,26 +21,20 @@ Function Add-Series() {
 }
 
 Function Update-SeriesConfig() {
-    Param($config, $series, $episodeNumber, $description, $background, $fontName, $fontSize, $interWordSpacing, $kerning)
+    Param($config, $series, $episodeNumber, $background, $fontName, $fontSize, $interWordSpacing, $interLineSpacing, $kerning)
     $seriesConfig = $config.$series
     if (!$seriesConfig) {
         Add-Series -config $config -seriesName $series
-        # TODO: update seriesConfig w/ description, episodeNumber, and background
     }
 
-    $desc = $seriesConfig.description
     $epn = $seriesConfig.episodeNumber
     $bkg = $seriesConfig.background
     $fn = $seriesConfig.fontName
     $fs = $seriesConfig.fontSize
     $iws = $seriesConfig.interWordSpacing
+    $ils = $seriesConfig.interLineSpacing
     $krn = $seriesConfig.kerning
 
-    if ($desc -ne $description) {
-        Write-Output "Updating $series description config"
-        $seriesConfig.description = $description
-        Set-NeedsUpdate -update $true
-    }
     if ($epn -ne $episodeNumber) {
         Write-Output "Updating $series episode number config to $episodeNumber"
         $seriesConfig.episodeNumber = $episodeNumber
@@ -83,6 +58,11 @@ Function Update-SeriesConfig() {
     if ($iws -ne $interWordSpacing) {
         Write-Output "Updating $series interWordSpacing config"
         $seriesConfig.interWordSpacing = $interWordSpacing
+        Set-NeedsUpdate -update $true
+    }
+    if ($ils -ne $interLineSpacing) {
+        Write-Output "Updating $series interLineSpacing config"
+        $seriesConfig.interLineSpacing = $interLineSpacing
         Set-NeedsUpdate -update $true
     }
     if ($krn -ne $kerning) {
@@ -129,7 +109,9 @@ Function New-Thumbnail() {
         [Parameter(ParameterSetName = "Default")]
         [Parameter(ParameterSetName = "Override")]
         [string]$episodeGravity,
-
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "Override")]
+        [string]$episodeOffset,
         [Parameter(ParameterSetName = "Default")]
         [Parameter(ParameterSetName = "Override")]
         [string]$font,
@@ -144,6 +126,9 @@ Function New-Thumbnail() {
         [Int]$interWordSpacing,
         [Parameter(ParameterSetName = "Default")]
         [Parameter(ParameterSetName = "Override")]
+        [Int]$interLineSpacing,
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "Override")]
         [string]$color,
         [Parameter(ParameterSetName = "Default")]
         [Parameter(ParameterSetName = "Override")]
@@ -156,6 +141,9 @@ Function New-Thumbnail() {
         [string]$titleGravity,
         [Parameter(ParameterSetName = "Default")]
         [Parameter(ParameterSetName = "Override")]
+        [string]$titleOffset,
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "Override")]
         [string]$title,
         [Parameter(ParameterSetName = "Default")]
         [Parameter(ParameterSetName = "Override")]
@@ -166,11 +154,21 @@ Function New-Thumbnail() {
         [Parameter(ParameterSetName = "Default")]
         [Parameter(ParameterSetName = "Override")]
         [string]$background,
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "Override")]
+        [string]$overlay,
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "Override")]
+        [string]$overlayGeometry,
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "Override")]
+        [string]$overlayGravity = "center",
         
         [Parameter(ParameterSetName = "Override")]
         [string]$episodeText
     )
     $episode
+    $overlayCommand
 
     try {
         if ($episodeText -eq "") {
@@ -183,10 +181,29 @@ Function New-Thumbnail() {
         $outFileName = "${seriesName}_thumbnail_${episode}.png"
         $output = join-path $outPath $outFileName.Replace(' ', '_')
 
-        magick convert $background -font $font -fill $color -pointsize $point `
+        if($overlay -ne ""){
+            $fontCommand = "-font '$font' -fill '$color' -pointsize '$point' -stroke '$strokeColor' -strokewidth '$strokeWidth' -kerning '$kerning' -interword-spacing '$interWordSpacing' -interline-spacing '$interLineSpacing'"
+
+            $strip = "magick convert '$background' -resize 1280x720 -size 1280x720 -fill 'rgba(0,0,0,0.5)' -draw 'rectangle 175,0 425,720' $output"
+            write-output "STRIP: " $strip
+            Invoke-Expression $strip
+            $logo = "magick composite -geometry '$overlayGeometry' -gravity '$overlayGravity' '$overlay' '$output' $output"
+            write-output "LOGO: " $logo
+            Invoke-Expression $logo
+            $episode = "magick convert '$output' -gravity '$episodeGravity' $fontCommand -annotate $episodeOffset '$episode' '$output'"
+            write-output "EP: " $episode
+            Invoke-Expression $episode
+            $title = "magick convert '$output' -gravity '$titleGravity' $fontCommand -annotate $titleOffset '$title' '$output'"
+            write-output "TITLE: " $title
+            Invoke-Expression $title
+        } else {
+            magick convert $background -font $font -fill $color -pointsize $point `
             -stroke $strokeColor -strokewidth $strokeWidth -kerning $kerning `
-            -interword-spacing $interWordSpacing -gravity $episodeGravity -annotate +25+10 $episode `
-            -gravity $titleGravity -annotate +25+10 $title $output
+            -interword-spacing $interWordSpacing -interline-spacing $interLineSpacing `
+            -gravity $episodeGravity -annotate +25+10 $episode `
+            -gravity $titleGravity -annotate +25+10 $title `
+            $output
+        }
 
     }
     catch {
@@ -196,53 +213,6 @@ Function New-Thumbnail() {
     }
 
     write-output "Thumbnail [$output] created"
-}
-
-Function Write-TitleAndDescription() {
-    [CmdletBinding(DefaultParametersetName = "Default")]
-    Param(
-        [Parameter(ParameterSetName = "Default")]
-        [string]$number,
-        [Parameter(ParameterSetName = "Default")]
-        [string]$zeroPad,
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "Override")]
-        $title,
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "Override")]
-        $subTitle,
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "Override")]
-        $description,
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "Override")]
-        $contactBlock,
-
-        [Parameter(ParameterSetName = "Override")]
-        [string]$episodeText
-    )
-
-    if ($episodeText -eq "") {
-        $paddedEpisode = ($number).PadLeft($zeroPad, '0')
-        $titleCasedTitle = (Get-Culture).TextInfo.ToTitleCase($title.ToLower())
-        Write-Output `n"--"
-        write-output "${titleCasedTitle}: $subTitle, $paddedEpisode"
-        Write-Output "--"`n
-    }
-    else {
-        $titleCasedTitle = (Get-Culture).TextInfo.ToTitleCase($title.ToLower())
-        Write-Output `n"--"
-        write-output "${titleCasedTitle}: $subTitle, $episodeText"
-        Write-Output "--"`n
-    }
-
-    if ($description) {
-        Get-Content $description | write-output 
-    }
-    if ($contactBlock) {
-        Get-Content $contactBlock | write-output 
-    }
-    Write-Output `n`n
 }
 
 Function Get-ConfigValue() {
