@@ -45,7 +45,7 @@
 .PARAMETER titleBackgound
     Default: none. Defines fill color for the title temp image.
 .PARAMETER fontName
-    Default: Bebas Neue Regular. The font ImageMagick will use for title and episode. Can be an installed ttf font or you can pass the full path to the ttf file.
+    Default: Bebas Neue Regular. The font ImageMagick will use for title and episode. Can be an installed ttf font or you can pass the full path to the ttf file. `magick convert -list font` to list installed fonts on your system known by imagemagick.
 .PARAMETER fontSize
     Default: 108pt. The font size ImageMagick will use for title and episode.
 .PARAMETER fontColor
@@ -100,7 +100,7 @@ Param(
     [string]$overlayGravity = "center",
     [Parameter(ParameterSetName = "Default")]
     [Parameter(ParameterSetName = "Override")]
-    [string]$overlayGeometry,
+    [string]$overlayGeometry = "+0+0",
 
     [Parameter(ParameterSetName = "Default")]
     [Parameter(ParameterSetName = "Override")]
@@ -152,6 +152,11 @@ Import-Module (Resolve-Path('makeThumbnailFunctions.psm1')) -Force
 #read config
 $config = Read-ConfigFile -configFile $configFile
 $seriesPath = $seriesName.toLower()
+if (!$($config.($seriesPath))) {
+    Add-Series -config $config -seriesName $seriesPath
+    Save-ConfigFile -config $config -configFile $configFile
+}
+
 Get-ConfigValue -config $config -series $seriesName -key "Description" | Out-Null
 if (!$background) {
     $background = '..\..\..\' + $seriesPath + '\' + $seriesPath.replace(' ', '_') + '_bg.png'

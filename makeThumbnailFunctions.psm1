@@ -12,6 +12,7 @@ Function Add-Series() {
         "fontName"      = $fontName
         "fontSize"      = $fontSize
         "interWordSpacing" = $interWordSpacing
+        "interLineSpacing" = $interLineSpacing
         "kerning"       = $kerning
         "title"         = $title
     }
@@ -24,7 +25,9 @@ Function Update-SeriesConfig() {
     Param($config, $series, $episodeNumber, $background, $fontName, $fontSize, $interWordSpacing, $interLineSpacing, $kerning)
     $seriesConfig = $config.$series
     if (!$seriesConfig) {
-        Add-Series -config $config -seriesName $series
+        #Add-Series -config $config -seriesName $series
+        Write-Error "Series $series does not exist in makeThumbnail.json. Exiting..."
+        Exit 1
     }
 
     $epn = $seriesConfig.episodeNumber
@@ -183,18 +186,14 @@ Function New-Thumbnail() {
 
         if($overlay -ne ""){
             $fontCommand = "-font '$font' -fill '$color' -pointsize '$point' -stroke '$strokeColor' -strokewidth '$strokeWidth' -kerning '$kerning' -interword-spacing '$interWordSpacing' -interline-spacing '$interLineSpacing'"
-
-            $strip = "magick convert '$background' -resize 1280x720 -size 1280x720 -fill 'rgba(0,0,0,0.5)' -draw 'rectangle 175,0 425,720' $output"
-            write-output "STRIP: " $strip
+            #$strip = "magick convert '$background' -resize 1280x720 -size 1280x720 -fill 'rgba(0,0,0,0.5)' -draw 'rectangle 175,0 425,720' $output"
+            $strip = "magick convert '$background' -resize 1280x720 -size 1280x720 $output"
             Invoke-Expression $strip
             $logo = "magick composite -geometry '$overlayGeometry' -gravity '$overlayGravity' '$overlay' '$output' $output"
-            write-output "LOGO: " $logo
             Invoke-Expression $logo
             $episode = "magick convert '$output' -gravity '$episodeGravity' $fontCommand -annotate $episodeOffset '$episode' '$output'"
-            write-output "EP: " $episode
             Invoke-Expression $episode
             $title = "magick convert '$output' -gravity '$titleGravity' $fontCommand -annotate $titleOffset '$title' '$output'"
-            write-output "TITLE: " $title
             Invoke-Expression $title
         } else {
             magick convert $background -font $font -fill $color -pointsize $point `
