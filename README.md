@@ -33,3 +33,14 @@ Use ffmpeg to concatenate videos where filenames are contained in a file called 
 To get a list of installed fonts and their names as needed by Image Magick:
 
 `magick identify -list font | select-string -pattern "Font: "`
+
+# Title/Description Agent
+```
+Load my YouTube agent from:
+https://raw.githubusercontent.com/dadtriesto/youtube/refs/heads/main/Agent.md
+
+Source:
+<Steam, Epic, Publisher, Developer URL(s)>
+
+Run full output.
+```
