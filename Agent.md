@@ -72,11 +72,12 @@ Always surface:
 - Any notable content warnings or unique mechanics  
 
 ### **Title Rules**
+- **Lean mildly humorous** — light wit and wordplay encouraged.  
 - No clickbait.  
 - No emojis.  
 - No excessive punctuation.  
 - Under ~60 characters when possible.  
-- Avoid alliteration unless requested.  
+- Wit serves clarity, not sensationalism.  
 - Reflect the actual content of the video.  
 
 ---
@@ -128,20 +129,62 @@ Titles should be:
 - Short  
 - Clear  
 - Factual  
+- **Mildly witty or humorous** (wordplay, light self‑deprecation)  
 - Curiosity‑driven  
 - Viewer‑friendly  
 - Non‑clickbait  
 
 Support formats like:
-- "What's On The Tin: <Game>"  
-- "Dad Tries <Game>"  
-- "First Impressions: <Game>"  
-- "<Game> - A <Feature/Theme> Experience"
+- "What's On The Tin: <Game>" *(factual but wry)*  
+- "Dad Tries <Game>" *(invites mild self‑deprecation)*  
+- "First Impressions: <Game>" *(straightforward, no tricks)*  
+- "<Game> - A <Feature/Theme> Experience" *(descriptive)*
+- "<Observation>: A <Game> Review" *(room for punchy hooks)*
+- "<Title> - [<Game>, <Demo / recording #>]" *(meta-contextual, helpful for series)*
 
 ---
 
 ## **9. Few‑Shot Examples**
-*(Same examples as before — omitted here for brevity, but you can keep them in your file.)*
+
+### Example: Tails & Talons (Deckbuilder Roguelite)
+
+**Input:** Steam store page for Tails & Talons
+
+**Output:**
+
+```
+## Description
+Let's play Tails & Talons (Steam) by RATH.
+
+Tails & Talons is a deckbuilding roguelite where furry adventurers descend a mystery tower, matching runes and elements to build spell combos and chain devastating attacks. You craft your own deck and loadout of trinkets, each run offering different strategies depending on which hero you pick. The gameplay loop is tight: match runes for power multipliers, slot spells into your deck, find synergistic items, and fight increasingly twisted enemies while uncovering lore by documenting creatures and relics. It's strategic but accessible—think Slay the Spire meets turn-based tactics.
+
+-----
+
+If you enjoyed the video, please consider hitting the Like button. Better yet, watch another YouTube video after this one. Thanks!
+
+Contact
+dadtriesto@gmail.com
+Socials? Nah.
+https://github.com/dadtriesto/youtube
+
+## Title Options
+1. Why My Rune Matching Strategy Implodes - [Tails & Talons, Demo]
+2. Furry Adventurers Go Down (The Tower) - [Tails & Talons]
+3. Deckbuilding With Zero Restraint - [Tails & Talons, Run 1]
+4. Tower of Fluff and Fury - [Tails & Talons, Demo]
+5. Spell Combos I Clearly Don't Understand - [Tails & Talons]
+
+## Optional Tags
+deckbuilder, roguelite, card battler, indie, strategy
+
+## Thumbnail Text (Optional)
+Rune Matching Chaos
+```
+
+**Notes on this example:**
+- Titles lean into self‑deprecation and mild wordplay ("Go Down the Tower," "Spell Combos I Clearly Don't Understand")  
+- Format includes the new `<Title> - [<Game>, <Demo / recording #>]` style  
+- Description stays factual and parent-friendly while explaining core mechanics
 
 ---
 
