@@ -143,7 +143,10 @@ Param(
     [string]$configFile = '.\makeThumbnail.json',
     [Parameter(ParameterSetName = "Default")]
     [Parameter(ParameterSetName = "Override")]
-    [Boolean]$skipWrite = $false
+    [Boolean]$skipWrite = $false,
+    [Parameter(ParameterSetName = "Default")]
+    [Parameter(ParameterSetName = "Override")]
+    [switch]$openViewer = $false
 );
 $global:needsUpdate = $false
 
@@ -170,7 +173,7 @@ if (!$fontName) {
         $fontName = $config.$($seriesName).fontName
     }
     else {
-        $fontName = = "Bebas-Neue-Regular"
+        $fontName = "Bebas-Neue-Regular"
     }
 }
 
@@ -231,15 +234,16 @@ if (!$titleOffset) {
 
 #create new stuff
 Get-Background -background $background | Out-Null
+[string]$thumbnailPath = $null
 if ($episodeText -eq "") {
-    New-Thumbnail -number $episodeNumber -zeroPad $episodeZeroPad `
+    $thumbnailPath = New-Thumbnail -number $episodeNumber -zeroPad $episodeZeroPad `
         -font $fontName -point $fontSize -color $fontColor -strokeColor $fontStrokeColor -strokeWidth $fontStrokeWidth -kerning $kerning -interwordSpacing $interWordSpacing -interlineSpacing $interLineSpacing `
         -episodeGravity $episodeNumberGravity -episodeOffset $episodeOffset -titleGravity $titleGravity -titleOffset $titleOffset -title $title `
         -outPath $outPath -seriesName $seriesName -background $background `
         -overlay $overlay -overlaygeometry $overlayGeometry -overlaygravity $overlayGravity
 }
 else {
-    New-Thumbnail -episodeText $episodeText -episodeGravity $episodeNumberGravity `
+    $thumbnailPath = New-Thumbnail -episodeText $episodeText -episodeGravity $episodeNumberGravity `
         -font $fontName -point $fontSize -color $fontColor -strokeColor $fontStrokeColor -strokeWidth $fontStrokeWidth  -kerning $kerning -interwordSpacing $interWordSpacing -interlineSpacing $interLineSpacing `
         -titleGravity $titleGravity -title $title `
         -outPath $outPath -seriesName $seriesName -background $background `
@@ -253,5 +257,13 @@ Update-SeriesConfig -config $config -series $seriesName -episodeNumber $episodeN
 if ($global:needsUpdate) {
     if (!$skipWrite) {
         Save-ConfigFile -config $config -configFile $configFile
+    }
+}
+
+if ($openViewer) {
+    [string]$trimmedOutput = $thumbnailPath.ToString().Trim()
+    write-host "Opening thumbnail [$trimmedOutput] in default viewer..."
+    if (Test-Path $trimmedOutput) {
+        Invoke-Item $trimmedOutput
     }
 }

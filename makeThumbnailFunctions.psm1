@@ -83,12 +83,13 @@ Function Read-ConfigFile() {
 Function Save-ConfigFile() {
     Param($config, $configFile)
     $config | ConvertTo-Json -depth 32 | Out-File $configFile
+    #ConvertTo-Json @($config) -depth 32 | Out-File $configFile
 }
 
 Function Get-Background() {
     Param($background)
     if (!$background) {
-        write-output "Please select a background"
+        write-host "Please select a background"
         Add-Type -AssemblyName System.Windows.Forms
         $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog
         $null = $FileBrowser.ShowDialog() # -still- not topmost from vs code terminal...
@@ -99,7 +100,7 @@ Function Get-Background() {
         $background = $FileBrowser.FileName
     }
 
-    $background
+    write-output $background
 }
 
 Function New-Thumbnail() {
@@ -154,7 +155,7 @@ Function New-Thumbnail() {
         [Parameter(ParameterSetName = "Default")]
         [Parameter(ParameterSetName = "Override")]
         [string]$seriesName,
-        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "Default")]   
         [Parameter(ParameterSetName = "Override")]
         [string]$background,
         [Parameter(ParameterSetName = "Default")]
@@ -211,11 +212,158 @@ Function New-Thumbnail() {
         exit 1;
     }
 
-    write-output "Thumbnail [$output] created"
+    write-host "Thumbnail creation command executed successfully."
+    [string]$trimmedOutput = $output.ToString().Trim()
+    Write-Output $trimmedOutput
 }
 
 Function Get-ConfigValue() {
     Param($config, $series, $key)
 
     $config.$($series).$($key)
+}
+
+# From https://stackoverflow.com/a/55384556, which comes from https://github.com/PowerShell/PowerShell/issues/2736
+# Formats JSON in a nicer format than the built-in ConvertTo-Json does.
+function Format-Json([Parameter(Mandatory, ValueFromPipeline)][String] $json) {
+    $indent = 0;
+    ($json -Split "`n" | % {
+        if ($_ -match '[\}\]]\s*,?\s*$') {
+            # This line ends with ] or }, decrement the indentation level
+            $indent--
+        }
+        $line = ('  ' * $indent) + $($_.TrimStart() -replace '":  (["{[])', '": $1' -replace ':  ', ': ')
+        if ($_ -match '[\{\[]\s*$') {
+            # This line ends with [ or {, increment the indentation level
+            $indent++
+        }
+        $line
+    }) -Join "`n"
+}
+
+function New-NewThumbnail {
+    Param(
+        [string]$outPath = "H:\\thumbnails\\",
+        [string]$seriesName,
+        [string]$episodeBackground = "none",
+        [string]$episodeNumber,
+        [string]$episodeNumberGravity = "NorthEast",
+        [string]$episodeOffset = "+25+10",
+        [Int]$episodeZeroPad = 2,
+        [string]$episodeText,
+        [string]$background,
+        [string]$overlay,
+        [string]$overlayGravity = "center",
+        [string]$overlayGeometry = "+0+0",
+        [string]$title = "DAD TRIES TO",
+        [string]$titleGravity = "NorthWest",
+        [string]$titleOffset = "+25+10",
+        [string]$titleBackgound = "none",
+        [string]$fontName,
+        [Int]$fontSize,
+        [string]$fontColor = "white",
+        [string]$fontStrokeColor = "black",
+        [Int]$fontStrokeWidth = 1,
+        [Int]$kerning,
+        [Int]$interWordSpacing,
+        [Int]$interLineSpacing,
+        [string]$configFile = '.\makeThumbnail-v1.json',
+        [Boolean]$skipWrite = $false
+    );
+
+    $allConfig = Get-Content -raw $configFile | ConvertFrom-Json
+
+    $existingConfig = $allConfig | Where-Object { $_.name -eq $seriesName }
+    if ($existingConfig) {
+        # Update existingConfig if parameters don't match
+        $updatedConfigItemNames = @()
+        if ($existingConfig.background -ne $background) {
+            $updatedConfigItemNames += "background"
+            $existingConfig.background = $background
+        }
+        if ($existingConfig.fontName -ne $fontName) {
+            $updatedConfigItemNames += "fontName"
+            $existingConfig.fontName = $fontName
+        }
+        if ($existingConfig.fontSize -ne $fontSize) {
+            $updatedConfigItemNames += "fontSize"
+            $existingConfig.fontSize = $fontSize
+        }
+        if ($existingConfig.interWordSpacing -ne $interWordSpacing) {
+            $updatedConfigItemNames += "interWordSpacing"
+            $existingConfig.interWordSpacing = $interWordSpacing
+        }
+        if ($existingConfig.interLineSpacing -ne $interLineSpacing) {
+            $updatedConfigItemNames += "interLineSpacing"
+            $existingConfig.interLineSpacing = $interLineSpacing
+        }
+        if ($existingConfig.kerning -ne $kerning) {
+            $updatedConfigItemNames += "kerning"
+            $existingConfig.kerning = $kerning
+        }
+        if ($existingConfig.overlay -ne $overlay) {
+            $updatedConfigItemNames += "overlay"
+            $existingConfig.overlay = $overlay
+        }
+        if ($existingConfig.overlayGravity -ne $overlayGravity) {
+            $updatedConfigItemNames += "overlayGravity"
+            $existingConfig.overlayGravity = $overlayGravity
+        }
+        if ($existingConfig.overlayGeometry -ne $overlayGeometry) {
+            $updatedConfigItemNames += "overlayGeometry"
+            $existingConfig.overlayGeometry = $overlayGeometry
+        }
+        if ($existingConfig.title -ne $title) {
+            $updatedConfigItemNames += "title"
+            $existingConfig.title = $title
+        }
+        if ($existingConfig.titleGravity -ne $titleGravity) {
+            $updatedConfigItemNames += "titleGravity"
+            $existingConfig.titleGravity = $titleGravity
+        }
+        if ($existingConfig.titleOffset -ne $titleOffset) {
+            $updatedConfigItemNames += "titleOffset"
+            $existingConfig.titleOffset = $titleOffset
+        }
+        if ($existingConfig.fontColor -ne $fontColor) {
+            $updatedConfigItemNames += "fontColor"
+            $existingConfig.fontColor = $fontColor
+        }
+        if ($existingConfig.fontStrokeColor -ne $fontStrokeColor) {
+            $updatedConfigItemNames += "fontStrokeColor"
+            $existingConfig.fontStrokeColor = $fontStrokeColor
+        }
+        if ($existingConfig.fontStrokeWidth -ne $fontStrokeWidth) {
+            $updatedConfigItemNames += "fontStrokeWidth"
+            $existingConfig.fontStrokeWidth = $fontStrokeWidth
+        }
+        if ($existingConfig.episodeNumber -ne $episodeNumber) {
+            $updatedConfigItemNames += "episodeNumber"
+            $existingConfig.episodeNumber = $episodeNumber
+        }
+        if ($existingConfig.episodeNumberGravity -ne $episodeNumberGravity) {
+            $updatedConfigItemNames += "episodeNumberGravity"
+            $existingConfig.episodeNumberGravity = $episodeNumberGravity
+        }
+        if ($existingConfig.episodeOffset -ne $episodeOffset) {
+            $updatedConfigItemNames += "episodeOffset"
+            $existingConfig.episodeOffset = $episodeOffset
+        }
+        if ($existingConfig.episodeZeroPad -ne $episodeZeroPad) {
+            $updatedConfigItemNames += "episodeZeroPad"
+            $existingConfig.episodeZeroPad = $episodeZeroPad
+        }
+        if ($existingConfig.episodeText -ne $episodeText) {
+            $updatedConfigItemNames += "episodeText"
+            $existingConfig.episodeText = $episodeText
+        }
+        if($updatedConfigItemNames.Count -eq 0) {
+            Write-Host "No changes to series [$seriesName] config. Exiting."
+            return
+        }
+        Write-Host "Updating series [$seriesName] params: " -Join $updatedConfigItemNames -Separator ","
+    } else {
+        Write-Host "Series [$seriesName] not found in config file [$configFile]. Creating new series."
+        Add-Series -config $allConfig -seriesName $seriesName
+    }
 }

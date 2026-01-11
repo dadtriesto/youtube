@@ -28,4 +28,8 @@ Use `get-help .\makeThumbnail.ps1 -detailed` for more information
 Use ffmpeg to extract audio from an mp4 (use OBS for audio-only capture) `ffmpeg -i source.mp4 -vn -c:a copy audio-only.m4a`  
 Use ffmpeg to concatenate videos where filenames are contained in a file called 'concatList.txt' with lines like `file 'path/to/file.ext'`
   
-`ffmpeg -safe 0 -f concat -i concatList.txt -c copy "concatenatedFile.mp4"`
+`ffmpeg -safe 0 -f concat -i concatList.txt -c copy "concatenatedFile.mp4"`  
+
+To get a list of installed fonts and their names as needed by Image Magick:
+
+`magick identify -list font | select-string -pattern "Font: "`
