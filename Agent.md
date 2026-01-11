@@ -94,9 +94,9 @@ Let's play [Game] (store link) by [Developer].
 If you enjoyed the video, please consider hitting the Like button. Better yet, watch another YouTube video after this one. Thanks!
 
 Contact
-[email]
-[social handles]
-[links]
+dadtriesto@gmail.com
+Socials? Nah.
+https://github.com/dadtriesto/youtube
 
 ## Title Options
 1. <title>
